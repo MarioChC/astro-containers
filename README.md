@@ -54,3 +54,54 @@ docker exec <container_id> /home/starlight/STARLIGHTv04/bash_script.sh
 
 # Adjust your data files and execute it as you need.
 ```
+Introduction
+
+This project aims to package the Starlight project into a container, facilitating its execution on modern systems. Despite being based on Fortran77, which is over 12 years old, Starlight remains a valuable and widely-used software tool within the astronomy community.
+
+Sources
+
+For detailed documentation and references, please visit the official Starlight website.
+
+Getting Started
+
+Building from the Repository
+Clone the Repository
+bash
+Copy code
+git clone https://github.com/MarioChC/astro-containers.git
+cd astro-containers
+Set Up Starlight
+Navigate to the 'config_files_starlight' folder, where you'll find the necessary files to configure and run Starlight, along with a sample spectrum for analysis.
+bash
+Copy code
+cd config_files_starlight
+Create Directories
+bash
+Copy code
+mkdir -p shared_directory/config_files_starlight/mask
+mkdir -p shared_directory/config_files_starlight/spectrum
+Build the Container
+bash
+Copy code
+docker build -t astro-containers/starlight .
+Run Starlight
+Execute Starlight in detached mode from the 'starlight' folder and keep it running.
+bash
+Copy code
+docker run -d -v <PATH>/astro-containers/starlight/shared_directory/:/home/starlight/shared_directory/ --name starlight_container <image_id> sleep infinity
+Copy Configuration Files
+Copy the configuration files to the 'shared_directory'.
+bash
+Copy code
+cp <PATH>/config_files_starlight/grid_example.in shared_directory/config_files_starlight/
+cp <PATH>/config_files_starlight/mask/* shared_directory/config_files_starlight/mask/
+cp <PATH>/config_files_starlight/spectrum/* shared_directory/config_files_starlight/spectrum/
+Run Analysis
+Execute the analysis with Starlight and the configuration files.
+bash
+Copy code
+docker exec <container_id> /home/starlight/STARLIGHTv04/bash_script.sh
+Access Output Files
+The output files will be stored in the 'astro-containers/starlight/shared_directory/output' directory on your computer.
+Customization
+Adjust your data files and execute the analysis as needed.
