@@ -20,9 +20,9 @@ cd astro-containers
 cd starlight
 
 # Create directories.
-mkdir config_files_starlight
-mkdir config_files_starlight/mask
-mkdir config_files_starlight/spectrum
+mkdir shared_directory/config_files_starlight
+mkdir shared_directory/config_files_starlight/mask
+mkdir shared_directory/config_files_starlight/spectrum
 
 # Build the container.
 docker build -t astro-containers/starlight .
