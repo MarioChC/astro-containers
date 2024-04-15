@@ -36,7 +36,7 @@ docker image ls
 #
 
 # Run starlight from this same folder.
-docker run -d -v /Users/mario/AC3/astro-containers_docker/starlight/shared_directory/:/home/starlight/shared_directory/ <image_id> sleep infinity
+docker run -d -v <PATH>/astro-containers_docker/starlight/shared_directory/:/home/starlight/shared_directory/ <image_id> sleep infinity
 
 # Check the container id.
 docker ps
