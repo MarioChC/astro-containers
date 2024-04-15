@@ -16,6 +16,8 @@ For any reference and docs go to http://www.starlight.ufsc.br/
 git clone https://github.com/MarioChC/astro-containers.git
 cd astro-containers
 
+# In the 'config_files_starlight' folder you will find the files needed to set up and run Starlight, along with a demo spectrum for analysis.
+
 # Go in the starlight folder.
 cd starlight
 
