@@ -16,7 +16,7 @@ For any reference and docs go to http://www.starlight.ufsc.br/
 git clone https://github.com/MarioChC/astro-containers.git
 cd astro-containers
 
-**# Go in the starlight folder.**
+# Go in the starlight folder.
 cd starlight
 
 # Create directories.
