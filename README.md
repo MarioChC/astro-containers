@@ -13,7 +13,7 @@ For any reference and docs go to http://www.starlight.ufsc.br/
 ## Build from the repository
 ```
 # Get the source code from GitHub.
-git clone https://github.com/ccatalan/astro-containers.git
+git clone https://github.com/MarioChC/astro-containers.git
 cd astro-containers
 
 # Go in the starlight folder.
@@ -50,33 +50,3 @@ docker exec <container_id> /home/starlight/STARLIGHTv04/bash_script.sh
 
 # Adjust your data files and execute it as you need.
 ```
-
-## Reuse the container image
-
-```
-# Get the image from quay or github cr
-podman pull quay.io/ccatalan/astro-containers-starlight:latest
-
-# Create the local folders we will mount in the container image
-mkdir -p ./spectrum/
-mkdir -p ./mask/
-mkdir -p ./out/
-touch ./StCv04.C11.arp220.config
-touch grid_example.in
-
-# For a reference on the content of the files that
-# are required to mount see the repository content
-
-#
-# If it is required run with -dt instead of -it to 
-# be executed in detached mode.
-#
-
-# Run the container
-podman run --rm -it \
-    -v ./spectrum/:/home/starlight/spectrum/:z \
-    -v ./mask/:/home/starlight/mask/:z \
-    -v ./out/:/home/starlight/out/:z \
-    -v ./StCv04.C11.arp220.config:/home/starlight/STARLIGHTv04/StCv04.C11.arp220.config:z \
-    quay.io/ccatalan/astro-containers-starlight \
-        < grid_example.in
