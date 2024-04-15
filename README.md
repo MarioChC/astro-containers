@@ -31,12 +31,7 @@ docker build -t astro-containers/starlight .
 # Check the image id. 
 docker image ls
 
-#
-# If it is required run with -dt instead of -it to
-# be executed in detached mode.
-#
-
-# Run starlight from this same folder.
+# Run Starlight in detached mode (-d) from this same folder and leave it running.
 docker run -d -v <PATH>/astro-containers_docker/starlight/shared_directory/:/home/starlight/shared_directory/ --name starlight_container <image_id> sleep infinity
 
 # Check the container id.
