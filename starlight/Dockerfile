@@ -4,7 +4,6 @@ MAINTAINER Cristina Catalan <cataln.cris@gmail.com>
 WORKDIR /home/starlight/STARLIGHTv04
 
 COPY STARLIGHTv04/* /home/starlight/STARLIGHTv04/
-COPY shared_directory/* /home/starlight/shared_directory/
 
 RUN ls
 RUN pwd
