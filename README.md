@@ -1,3 +1,5 @@
+# Starlight Docker Container
+
 This project packages the starlight project in a container,
 this is to aid with running this project in modern
 systems. This works with fortran77 which is more than 12 years
@@ -8,10 +10,8 @@ community.
 
 For any reference and docs go to http://www.starlight.ufsc.br/
 
-## How-to
+## How-to build from the repository
 
-## Build from the repository
-```
 # Get the source code from GitHub.
 git clone https://github.com/MarioChC/astro-containers.git
 cd astro-containers
