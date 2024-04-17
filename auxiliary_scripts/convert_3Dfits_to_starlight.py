@@ -13,7 +13,7 @@ import argparse
 
 # Parser
 parser = argparse.ArgumentParser(description='Converts 3D FITS files to a format compatible with Starlight')
-parser.add_argument('-s', '--spectrum', metavar='RSS SPECTRUM', help='FITS RSS spectrum', type=argparse.FileType('rb'))
+parser.add_argument('-s', '--spectrum', metavar='3D DATACUBE', help='3D datacube', type=argparse.FileType('rb'))
 parser.add_argument('-o', '--output-directory', metavar='STRING ID', default='./', help='Directory to save the output files')
 parser.add_argument('-i', '--output-file', metavar='STRING ID', default='test', help='Label added to saved output files')
 
