@@ -8,7 +8,8 @@ This script converts 3D FITS files to a format compatible with Starlight.
 
 ### Usage
 
-```bash
+```
+
 python convert_3Dfits_to_starlight.py [options] [-h] [-s 3D DATACUBE] [-o OUTPUT DIRECTORY] [-i OUTPUT FILE]
 
 Arguments:
@@ -19,7 +20,7 @@ Arguments:
 
 Example
 convert_3Dfits_to_starlight.py -s datacube.fits -o output_dir -i output_file
-
+```
 
 ## Script 2: starlight_grid_file_assign_spectra.py
 
@@ -27,7 +28,7 @@ This script modifies the `grid.in` file used by Starlight for analysis by automa
 
 ## Usage
 
-```bash
+```
 starlight_grid_file_assign_spectra.py [-h] input_file output_file [spectrum_names [spectrum_names ...]]
 
 Arguments:
