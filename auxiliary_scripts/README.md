@@ -18,8 +18,9 @@ Arguments:
 -o OUTPUT DIRECTORY, --output-directory OUTPUT DIRECTORY: Directory to save the output files.
 -i OUTPUT FILE, --output-file OUTPUT FILE: Label added to saved output files.
 
-Example
-convert_3Dfits_to_starlight.py -s datacube.fits -o output_dir -i output_file
+Example:
+
+python convert_3Dfits_to_starlight.py -s datacube.fits -o output_dir -i output_file
 ```
 
 ## Script 2: starlight_grid_file_assign_spectra.py
@@ -35,7 +36,10 @@ Arguments:
 input_file: Path to the input file (grid.in).
 output_file: Path to the output file (modified grid.in).
 spectrum_names: Names of spectrum files to include in the analysis.
+-h, --help: Show help message and exit.
 
-Example
-starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectrum1.txt spectrum2.txt spectrum3.txt
+Example:
 
+python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectrum1.txt spectrum2.txt spectrum3.txt
+
+python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectra_folder/*
