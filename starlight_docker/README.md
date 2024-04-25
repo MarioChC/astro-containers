@@ -14,7 +14,7 @@ For any reference and docs go to http://www.starlight.ufsc.br/
 ```
 # Clone the repository from GitHub:
 git clone https://github.com/MarioChC/astro-containers.git
-cd astro-containers
+cd astro-containers/starlight_docker
 
 # Navigate to the "config_files_starlight" folder, which contains the necessary files to set up and run Starlight, along with a demo spectrum for analysis.
 
