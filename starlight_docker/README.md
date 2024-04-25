@@ -34,7 +34,7 @@ docker build -t starlight_image .
 docker image ls
 
 # Run Starlight in detached mode (-d) from the same folder, mounting a shared volume between the local machine and the container, and leave it running:
-docker run -d -v <PATH>/astro-containers/starlight_docker/starlight/shared_directory/:/home/starlight/shared_directory/ --name starlight_container <image_id> sleep infinity
+docker run -d -v --name starlight_container <PATH>/astro-containers/starlight_docker/starlight/shared_directory/:/home/starlight/shared_directory/ --name starlight_container starlight_image sleep infinity
 
 # Check the container ID:
 docker ps
