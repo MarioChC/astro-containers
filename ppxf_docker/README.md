@@ -23,7 +23,7 @@ docker image ls
 
 # Run pPXF container in detached mode (-d) from the same folder, mounting a shared volume between the local machine and the container, and leave it running:
 
-docker run -d --name ppxf_container -v <PATH>/astro-containers_docker/ppxf_docker/ppxf/shared_directory/:/home/ppxf/shared_directory/ ppxf_image sleep infinity
+docker run -d --name ppxf_container -v <PATH>/astro-containers/ppxf_docker/ppxf/shared_directory/:/home/ppxf/shared_directory/ ppxf_image sleep infinity
 
 # Check the container ID:
 docker ps
