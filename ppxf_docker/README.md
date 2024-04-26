@@ -32,7 +32,7 @@ cp -r ../input shared_directory/
 
 # Run pPXF container in detached mode (-d) from the same folder, mounting a shared volume between the local machine and the container, and leave it running:
 
-docker run -d --name ppxf_container -v <PATH>/astro-containers/ppxf_docker/ppxf/shared_directory/:/home/ppxf/shared_directory/ <IMAGE_ID> sleep infinity
+docker run -d --name ppxf_container -v <LOCAL_PATH>/astro-containers/ppxf_docker/ppxf/shared_directory/:/home/ppxf/shared_directory/ <IMAGE_ID> sleep infinity
 
 # Check the container ID:
 docker ps
@@ -40,7 +40,7 @@ docker ps
 # Run the analysis with Starlight and the configuration files:
 docker exec ppxf_container /home/ppxf/shared_directory/input/bash_script.sh
 
-# The output files will be stored in your computer in the "astro-containers/ppxf_docker/ppxf/shared_directory/output" directory.
+# The output files will be stored in your computer in the "<LOCAL_PATH>/astro-containers/ppxf_docker/ppxf/shared_directory/output" directory.
 
 # Adjust your data files and execute it as you need.
 ```
