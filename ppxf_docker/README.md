@@ -21,18 +21,21 @@ docker build -t ppxf_image .
 # Check the image ID:
 docker image ls
 
-# Run pPXF container in detached mode (-d) from the same folder, mounting a shared volume between the local machine and the container, and leave it running:
-
-docker run -d --name ppxf_container -v <PATH>/astro-containers/ppxf_docker/ppxf/shared_directory/:/home/ppxf/shared_directory/ ppxf_image sleep infinity
-
-# Check the container ID:
-docker ps
+# Create the shared directories:
+mkdir shared_directory
 
 # Create the output directory in the shared volume:
 mkdir shared_directory/output
 
 # Copy the directory with yout input files:
 cp -r ../input shared_directory/
+
+# Run pPXF container in detached mode (-d) from the same folder, mounting a shared volume between the local machine and the container, and leave it running:
+
+docker run -d --name ppxf_container -v <PATH>/astro-containers/ppxf_docker/ppxf/shared_directory/:/home/ppxf/shared_directory/ <IMAGE_ID> sleep infinity
+
+# Check the container ID:
+docker ps
 
 # Run the analysis with Starlight and the configuration files:
 docker exec ppxf_container /home/ppxf/shared_directory/input/bash_script.sh
