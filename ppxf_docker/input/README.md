@@ -19,13 +19,13 @@ This command executes the ppxf_megara.py script with the specified input file (N
 
 filename: Path to the spectra file to be analyzed.
 
---wave-range start end: Range of wavelengths to focus on.
+--wave-range start end: Range of wavelengths to focus on (default: full spectral range covered by the observation).
 
 --target-sn SN: Target signal-to-noise ratio for Voronoi binning (default: 175).
 
 --sps-name SPS_NAME: Name of the SPS model to be used (default: emiles).
 
---mask-file MASK_FILE: Path to the mask file.
+--mask-file MASK_FILE: Path to the mask file (default: none).
 
 --output-dir OUTPUT_DIR: Directory where the output FITS files will be saved (default: current directory).
 
