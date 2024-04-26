@@ -34,7 +34,7 @@ docker build -t starlight_image .
 docker image ls
 
 # Run Starlight in detached mode (-d) from the same folder, mounting a shared volume between the local machine and the container, and leave it running:
-docker run -d -v --name starlight_container <LOCAL_PATH>/astro-containers/starlight_docker/starlight/shared_directory/:/home/starlight/shared_directory/ --name starlight_container starlight_image sleep infinity
+docker run -d -v --name starlight_container <LOCAL_PATH>/astro-containers/starlight_docker/starlight/shared_directory/:/home/starlight/shared_directory/ --name starlight_container <IMAGE_ID> sleep infinity
 
 # Check the container ID:
 docker ps
@@ -48,7 +48,7 @@ cp <LOCAL_PATH>/config_files_starlight/mask/* shared_directory/config_files_star
 cp <LOCAL_PATH>/config_files_starlight/spectrum/* shared_directory/config_files_starlight/spectrum/
 
 # Run the analysis with Starlight and the configuration files:
-docker exec <container_id> /home/starlight/STARLIGHTv04/bash_script.sh
+docker exec <CONTAINER_ID> /home/starlight/STARLIGHTv04/bash_script.sh
 
 # The output files will be stored in your computer in the "<LOCAL_PATH>/astro-containers/starlight_docker/starlight/shared_directory/output" directory.
 
