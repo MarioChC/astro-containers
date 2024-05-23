@@ -23,6 +23,7 @@ cd starlight
 
 # Create the required directories:
 mkdir shared_directory
+mkdir shared_directory/output
 mkdir shared_directory/config_files_starlight
 mkdir shared_directory/config_files_starlight/mask
 mkdir shared_directory/config_files_starlight/spectrum
