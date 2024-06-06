@@ -48,21 +48,21 @@ Each line in this file corresponds to one spectrum and its associated kinematic 
 
 ## Script 2: starlight_grid_file_assign_spectra.py
 
-This script modifies the `grid.in` file used by Starlight for analysis by automatically including the spectra you want to analyze.
+This script generates a Starlight input file based on provided parameters and kinematic information.
 
 ### Usage
 
 ```
-starlight_grid_file_assign_spectra.py [-h] input_file output_file [spectrum_names [spectrum_names ...]]
+starlight_grid_file_assign_spectra.py [-h] output_file [spectrum_names [spectrum_names ...]] [kinematic_file]
 
 Arguments:
-input_file: Path to the input file (grid.in).
-output_file: Path to the output file (modified grid.in).
+output_file: Path to the output file (grid.in).
 spectrum_names: Names of spectrum files to include in the analysis.
+kinematic_file: Path to the file that contains the information about the kinematics.
 -h, --help: Show help message and exit.
 
 Example:
 
-python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectrum1.txt spectrum2.txt spectrum3.txt
+python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectrum1.txt spectrum2.txt spectrum3.txt kinematic_info.txt
 
-python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectra_folder/*
+python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectra_folder/* kinematic_info.txt
