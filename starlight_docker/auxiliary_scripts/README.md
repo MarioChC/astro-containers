@@ -63,6 +63,6 @@ kinematic_file: Path to the file that contains the information about the kinemat
 
 Example:
 
-python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectrum1.txt spectrum2.txt spectrum3.txt kinematic_info.txt
+python starlight_grid_file_assign_spectra.py grid.in spectrum1.txt spectrum2.txt spectrum3.txt kinematic_info.txt
 
-python starlight_grid_file_assign_spectra.py grid.in modified_grid.in spectra_folder/* kinematic_info.txt
+python starlight_grid_file_assign_spectra.py grid.in spectra_folder/* kinematic_info.txt
