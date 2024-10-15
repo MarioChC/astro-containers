@@ -32,6 +32,7 @@ parser.add_argument('--sps-name', type=str, default='emiles', metavar='SPS_NAME'
 parser.add_argument('--mask-file', type=str, help='Path to the mask file')
 parser.add_argument('--output-dir', type=str, default='./', metavar='OUTPUT_DIR',
                     help='Directory where the output FITS files will be saved (default: current directory)')
+parser.add_argument('--suffix', type=str, default='', help='Optional label to append to the output file names')
 parser.add_argument('--redshift', type=float, default=0.0, metavar='REDSHIFT',
                     help='Redshift of the galaxy (default: 0)')
 parser.add_argument('--sn-range', nargs=2, type=float, metavar=('start', 'end'),
@@ -152,7 +153,7 @@ def fit_and_clean(templates, galaxy, velscale, start, goodpixels0, lam, lam_temp
     goodpixels = goodpixels0.copy()
     pp = ppxf(templates, galaxy, np.ones_like(galaxy), velscale, start,
               moments=4, degree=4, mdegree=4, lam=lam, lam_temp=lam_temp,
-              goodpixels=goodpixels, plot_title=plot_title)
+              goodpixels=goodpixels, plot_title=plot_title, reddening=2)
     
     #plt.figure(figsize=(8, 3.7))
     #plt.subplot(121)
@@ -164,7 +165,7 @@ def fit_and_clean(templates, galaxy, velscale, start, goodpixels0, lam, lam_temp
     goodpixels = np.intersect1d(goodpixels, goodpixels0)
     pp = ppxf(templates, galaxy, np.ones_like(galaxy), velscale, start,
               moments=4, degree=4, mdegree=4, lam=lam, lam_temp=lam_temp,
-              goodpixels=goodpixels, plot_title=plot_title)
+              goodpixels=goodpixels, plot_title=plot_title, reddening=2)
     
     #plt.subplot(122)
     pp.plot_mine()
@@ -506,7 +507,7 @@ goodpixels0 = util.determine_goodpixels(s.ln_lam_gal, lam_range_temp, z, width=1
 
 nbins = sn.size
 # velbin, velbin_error, sigbin, sigbin_error, lg_age_bin, metalbin, nspax = np.zeros((7, nbins))
-velbin, velbin_error, sigbin, sigbin_error, h3bin, h3bin_error, h4bin, h4bin_error, lg_age_bin, metalbin, nspax = np.zeros((11, nbins)) # Uncomment for fitting h3 and h4 and comment the previous line
+velbin, velbin_error, sigbin, sigbin_error, h3bin, h3bin_error, h4bin, h4bin_error, lg_age_bin, metalbin, nspax, attbin = np.zeros((12, nbins)) # Uncomment for fitting h3 and h4 and comment the previous line
 optimal_templates = np.empty((stars_templates.shape[0], nbins))
 
 lam_gal = np.exp(s.ln_lam_gal)
@@ -542,6 +543,7 @@ for j in range(nbins):
     velbin[j], sigbin[j], h3bin[j], h4bin[j] = pp.sol  # Uncomment for fitting h3 and h4 and comment the previous line
     velbin_error[j], sigbin_error[j], h3bin_error[j], h4bin_error[j] = pp.error*np.sqrt(pp.chi2)  # Uncomment for fitting h3 and h4 and comment the previous line
     optimal_templates[:, j] = bestfit_template
+    attbin[j] = pp.reddening
         
     # Save figures of the fittings
     
@@ -595,12 +597,17 @@ else:
 
 # Save results as FITS files.
 
-# Specify the name for the new FITS file you want to create
-#kinematics_results_FITS = f'/home/ppxf_docker/shared_directory/output/{args.filename.split("/")[-1].replace(".fits", "_kinematics.fits")}'
-#stellar_pops_results_FITS = f'/home/ppxf_docker/shared_directory/output/{args.filename.split("/")[-1].replace(".fits", "_stellar_pops.fits")}'
+# Specify the output file names
 
-kinematics_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_kinematics.fits"))
-stellar_pops_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_stellar_pops.fits"))
+base_filename = os.path.basename(args.filename).replace('.fits', '')
+suffix = f"_{args.suffix}" if args.suffix else ''
+kinematics_results_FITS = os.path.join(args.output_dir, f"{base_filename}_kinematics{suffix}.fits")
+stellar_pops_results_FITS = os.path.join(args.output_dir, f"{base_filename}_stellar_pops{suffix}.fits")
+attenuation_results_FITS = os.path.join(args.output_dir, f"{base_filename}_attenuation{suffix}.fits")
+
+#kinematics_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_kinematics.fits"))
+#stellar_pops_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_stellar_pops.fits"))
+#attenuation_results_FITS = os.path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_attenuation.fits"))
 
 kinematics_fitting_results = np.concatenate([velbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
                                              velbin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
@@ -613,6 +620,10 @@ kinematics_fitting_results = np.concatenate([velbin[bin_num].reshape(-1,s.cube_s
 
 stellar_pops_fitting_results = np.concatenate([lg_age_bin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
                                                metalbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])], axis=0)
+
+attenuation_fitting_results = attbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])
+
 # Call the function to save the results as a FITS file
 save_results_as_fits(kinematics_fitting_results, spectra_filename, kinematics_results_FITS)
 save_results_as_fits(stellar_pops_fitting_results, spectra_filename, stellar_pops_results_FITS)
+save_results_as_fits(attenuation_fitting_results, spectra_filename, attenuation_results_FITS)
