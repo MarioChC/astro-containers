@@ -23,3 +23,4 @@ COPY run_ppxf/ssp_models/* /usr/local/lib/python3.8/dist-packages/ppxf/sps_model
 COPY run_ppxf/modified_scripts/ppxf.py /usr/local/lib/python3.8/dist-packages/ppxf/
 COPY run_ppxf/modified_scripts/sps_util.py /usr/local/lib/python3.8/dist-packages/ppxf/
 COPY run_ppxf/modified_scripts/voronoi_2d_binning.py /usr/local/lib/python3.8/dist-packages/vorbin/
+RUN cp /usr/local/lib/python3.8/dist-packages/capfit/capfit.py /usr/local/lib/python3.8/dist-packages/ppxf/
