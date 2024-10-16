@@ -31,13 +31,13 @@ mkdir shared_directory/output
 cp -r ../input shared_directory/
 
 # Run Steckmap container in detached mode (-d) from the same folder, mounting a shared volume between the local machine and the container, and leave it running:
-docker run -d --name steckmap_container -v <LOCAL_PATH>/astro-containers/steckmap_docker/steckmap/shared_directory/:/home/steckmap/shared_directory/ <IMAGE_ID> sleep infinity
+docker run -d --name steckmap_container -v <LOCAL_PATH>/astro-containers/steckmap_docker/steckmap/shared_directory/:/root/Yorick/shared_directory/ <IMAGE_ID> sleep infinity
 
 # Check the container ID:
 docker ps
 
 # Run the analysis with Steckmap and the configuration files:
-docker exec steckmap_container /home/steckmap/shared_directory/input/run_steckmap.i
+docker exec steckmap_container yorick -batch shared_directory/input/run_steckmap.i
 
 # The output files will be stored in your computer in the "<LOCAL_PATH>/astro-containers/steckmap_docker/steckmap/shared_directory/output/" directory.
 
