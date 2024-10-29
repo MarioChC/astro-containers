@@ -1,6 +1,6 @@
 # Starlight Docker Container
 
-This project packages the starlight project in a container,
+This project packages the starlight project (Cid Fernandes, R. et al. 2005, MNRAS, 358, 363 and Cid Fernandes, et al 2007, RevMexAA) in a container,
 this is to aid with running this project in modern
 systems. This works with fortran77 which is more than 12 years
 old, still the software is useful and commonly used in the astronomy
