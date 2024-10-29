@@ -1,11 +1,19 @@
-Corresponding SPDX licence
+**Corresponding SPDX licence**
+
 BSD 3-Clause "New" or "Revised" License
-Licence ID
+
+**Licence ID**
+
 BSD-3-Clause
-See also
+
+See also:
+
 https://opensource.org/licenses/BSD-3-Clause
+
 https://www.eclipse.org/org/documents/edl-v10.php
-Licence text
+
+**Licence text**
+
 Copyright (c) 2024 Mario Chamorro Cazorla.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
