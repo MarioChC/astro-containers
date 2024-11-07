@@ -1,5 +1,5 @@
 --- /usr/local/lib/python3.8/dist-packages/ppxf/ppxf.py	2024-11-07 12:27:08.749543905 +0000
-+++ shared_directory/modified_scripts/ppxf.py	2024-11-07 14:58:35.004225680 +0000
++++ shared_directory/ppxf.py	2024-11-07 19:06:30.809544785 +0000
 @@ -1,5 +1,5 @@
  """
 -    Copyright (C) 2001-2024, Michele Cappellari
@@ -692,7 +692,7 @@
              ref = np.min(bestfit_shown) - 2*sig3
              mx = np.max(bestfit_shown) + sig3
              resid += ref                           # Offset residuals to avoid overlap
-@@ -2617,6 +2586,203 @@
+@@ -2617,6 +2586,202 @@
  
  ################################################################################
  
@@ -825,7 +825,7 @@
 +                plt.plot(x, bestfit, 'orange', linewidth=2)
 +#            else:
 +#                plt.plot(x[self.goodpixels], self.goodpixels*0 + ref, '.k', ms=1)
-+
++            plt.ylim([np.min(resid[self.goodpixels]) - sig3, np.max(resid[self.goodpixels]) + sig3] + np.array([-0.05, 0.05])*((np.min(resid[self.goodpixels]) - sig3) - (np.max(resid[self.goodpixels]) + sig3)))
 +        plt.xlabel("Observed wavelength [$\mathregular{\AA}$]", fontsize = 12)
 +        plt.rc('axes',linewidth=1.5)
 +        ax = plt.gca()
@@ -837,7 +837,6 @@
 +        plt.subplots_adjust(left =0.1, bottom =0.2, right =0.9, top =0.99)
 +        ax.xaxis.set_minor_locator(AutoMinorLocator())
 +        ax.yaxis.set_minor_locator(AutoMinorLocator())
-+        plt.ylim([mn_res, mx_res] + np.array([-0.05, 0.05])*(mx_res - mn_res))
 +        
 +        # Plot observed photometry
 +        if phot:

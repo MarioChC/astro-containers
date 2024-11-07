@@ -35,6 +35,8 @@ parser.add_argument('--output-dir', type=str, default='./', metavar='OUTPUT_DIR'
 parser.add_argument('--suffix', type=str, default='', help='Optional label to append to the output file names')
 parser.add_argument('--redshift', type=float, default=0.0, metavar='REDSHIFT',
                     help='Redshift of the galaxy (default: 0)')
+parser.add_argument('--velocity-dispersion', type=float, default=100.0, metavar='VEL_DISP',
+                    help='Initial guess for the velocity dispersion of the galaxy (default: 100 km/s)')
 parser.add_argument('--sn-range', nargs=2, type=float, metavar=('start', 'end'),
                     help='Range of wavelengths to calculate the signal-to-noise ratio (default: same as --wave-range)')
                     
@@ -424,11 +426,17 @@ s = read_megara_cube(spectra_filename, lam_range_temp)
 signal, noise = calculate_signal_to_noise(s.spectra,np.exp(s.ln_lam_gal), mask_file=args.mask_file, wavelength_range=args.sn_range, redshift=args.redshift)
 target_sn = args.target_sn
 
+
+# Saving files nomenclature
+
+base_filename = os.path.basename(args.filename).replace('.fits', '')
+suffix = f"_{args.suffix}" if args.suffix else ''
+
 # Perform Voronoi binning with the method of [Cappellari & Copin (2003)](https://ui.adsabs.harvard.edu/abs/2003MNRAS.342..345C)
 
 plt.figure(figsize=(7,10))
 bin_num, x_gen, y_gen, xbin, ybin, sn, nPixels, scale = voronoi_2d_binning(s.x, s.y, signal, noise, target_sn, plot=1, quiet=1)
-plt.savefig(path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_voronoi_binning.pdf")),dpi=600)
+plt.savefig(path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", f"_voronoi_binning_sn_{target_sn}{suffix}.pdf")),dpi=600)
 # Saving the information of which Voronoi region each pixel belongs to
 
 # Create index matrices
@@ -437,7 +445,7 @@ indices_x, indices_y = np.meshgrid(np.arange(s.cube_shape[1]), np.arange(s.cube_
 x_flat = indices_x.flatten()
 y_flat = indices_y.flatten()
 voronoi_bins = np.column_stack((x_flat, y_flat, bin_num))
-np.savetxt(path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_voronoi_binning_info.txt")), voronoi_bins, fmt='%.i %.i %.i', comments='')
+np.savetxt(path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", f"_voronoi_binning_info_sn_{target_sn}{suffix}.txt")), voronoi_bins, fmt='%.i %.i %.i', comments='')
 
 ## Setup stellar templates
 #The important formula below **defines** the relation between velocity, wavelength and redshift in ``pPXF`` (eq. 8 of [Cappellari 2017](https://ui.adsabs.harvard.edu/abs/2017MNRAS.466..798C))
@@ -495,7 +503,10 @@ print("=" * 80)
 print("Galaxy redshift:", z)
 print("=" * 80)
 vel0 = c_kms*np.log(1 + z)  # Initial estimate of the galaxy velocity in km/s. eq. (8) of Cappellari (2017)
-start = [vel0, 200.]  # (km/s), starting guess for [V,sigma]
+sigma = args.velocity_dispersion
+print("Velocity dispersion initial guess:", sigma, "km/s")
+print("=" * 80)
+start = [vel0, sigma]  # (km/s), starting guess for [V,sigma]
 
 lam_range_temp = np.exp(ln_lam_temp[[0, -1]])
 goodpixels0 = util.determine_goodpixels(s.ln_lam_gal, lam_range_temp, z, width=1000)
@@ -521,14 +532,15 @@ else:
     goodpixels_masked = goodpixels0
 
 # Directory to save the figures
-plot_dir = path.join(args.output_dir, "Plots_spectral_fitting")
+# plot_dir = path.join(args.output_dir, "Plots_spectral_fitting")
+plot_dir = os.path.join(args.output_dir, f"Plots_spectral_fitting_{base_filename}_sn_{target_sn}{suffix}")
 
 # Check if the directory exists, and if not, create it
 if not os.path.exists(plot_dir):
     os.makedirs(plot_dir)
 
 # Save the information about stellar pops SSP used for the fitting of each Voronoi bin
-voronoi_output_file = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_stellar_pops_info.txt"))
+voronoi_output_file = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", f"_stellar_pops_info_sn_{target_sn}{suffix}.txt"))
 voronoi_output_file = open(voronoi_output_file, "w")  # Open file in write mode
 voronoi_output_file.write("Age Metallicity Weight\n")
 
@@ -599,11 +611,11 @@ else:
 
 # Specify the output file names
 
-base_filename = os.path.basename(args.filename).replace('.fits', '')
-suffix = f"_{args.suffix}" if args.suffix else ''
-kinematics_results_FITS = os.path.join(args.output_dir, f"{base_filename}_kinematics{suffix}.fits")
-stellar_pops_results_FITS = os.path.join(args.output_dir, f"{base_filename}_stellar_pops{suffix}.fits")
-attenuation_results_FITS = os.path.join(args.output_dir, f"{base_filename}_attenuation{suffix}.fits")
+# base_filename = os.path.basename(args.filename).replace('.fits', '')
+# suffix = f"_{args.suffix}" if args.suffix else ''
+kinematics_results_FITS = os.path.join(args.output_dir, f"{base_filename}_kinematics_sn_{target_sn}{suffix}.fits")
+stellar_pops_results_FITS = os.path.join(args.output_dir, f"{base_filename}_stellar_pops_sn_{target_sn}{suffix}.fits")
+attenuation_results_FITS = os.path.join(args.output_dir, f"{base_filename}_attenuation_sn_{target_sn}{suffix}.fits")
 
 #kinematics_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_kinematics.fits"))
 #stellar_pops_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_stellar_pops.fits"))
