@@ -10,10 +10,10 @@ The bash_script.sh file contains the commands necessary to run the ppxf_megara.p
 An example command to run the script is as follows:
 
 ```
-python3 /home/ppxf/run_ppxf/ppxf_megara.py /home/ppxf/shared_directory/input/NGC7025_LR-V_final_cube.fits --mask-file /home/ppxf/shared_directory/input/mask.txt --target-sn 200 --redshift 0.016571 --sn-range 5600 5800 --output-dir /home/ppxf/shared_directory/output
+python3 /home/ppxf/run_ppxf/ppxf_megara.py /home/ppxf/shared_directory/input/NGC7025_LR-V_final_cube.fits --mask-file /home/ppxf/shared_directory/input/mask.txt --target-sn 200 --redshift 0.016571 --velocity-dispersion 200 --sn-range 5600 5800 --output-dir /home/ppxf/shared_directory/output
 ```
 
-This command executes the ppxf_megara.py script with the specified input file (NGC7025_LR-V_final_cube.fits), mask file (mask.txt), target signal-to-noise ratio (200), redshift (0.016571), signal-to-noise ratio range (5600 to 5800), and output directory (/home/ppxf/shared_directory/output).
+This command executes the ppxf_megara.py script with the specified input file (NGC7025_LR-V_final_cube.fits), mask file (mask.txt), target signal-to-noise ratio (200), redshift (0.016571), initial guess for velocity dispersion (200), signal-to-noise ratio range (5600 to 5800), and output directory (/home/ppxf/shared_directory/output).
 
 ## Input Arguments
 
@@ -30,6 +30,8 @@ filename: Path to the spectra file to be analyzed.
 --output-dir OUTPUT_DIR: Directory where the output FITS files will be saved (default: current directory).
 
 --redshift REDSHIFT: Redshift of the galaxy (default: 0).
+
+--velocity-dispersion VEL_DISP`: Initial guess for the velocity dispersion of the galaxy (default: 100 km/s).
 
 --sn-range start end: Range of wavelengths to calculate the signal-to-noise ratio (default: same as --wave-range).
 
