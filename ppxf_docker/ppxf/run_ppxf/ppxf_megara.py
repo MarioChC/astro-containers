@@ -484,7 +484,7 @@ hdu_voronoi = fits.PrimaryHDU(data=voronoi_cube_data, header=s.header)
 voronoi_results_FITS = os.path.join(args.output_dir, f"{base_filename}_voronoi_binned_sn_{target_sn}{suffix}.fits")
 hdu_voronoi.writeto(voronoi_results_FITS, overwrite=True)
 # Save SNR maps to FITS files
-snr = (signal/noise).reshape((28, 31))
+snr = (signal/noise).reshape((s.cube_shape[1], s.cube_shape[2]))
 hdu_snr_before = fits.PrimaryHDU(data=snr, header=header)
 snr_results_FITS = os.path.join(args.output_dir, f"{base_filename}_snr_map{suffix}.fits")
 hdu_snr_before.writeto(snr_results_FITS, overwrite=True)
