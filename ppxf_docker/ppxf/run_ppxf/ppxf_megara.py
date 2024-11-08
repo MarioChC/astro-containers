@@ -115,6 +115,8 @@ class read_megara_cube(object):
         spectra_cgs, ln_lam_gal, velscale = util.log_rebin(lam_range_temp, spectra_cgs, velscale=velscale)
         # spectra, ln_lam_gal, velscale = util.log_rebin(lam_range_temp, spectra, velscale=velscale)
 
+        self.original_data = cube
+        self.header = head
         self.spectra = spectra_cgs
         self.x = x
         self.y = y
@@ -385,6 +387,35 @@ def correct_sigma(fwhm_gal, fwhm_template, sigma_ppxf, central_wavelength):
     corrected_sigma = np.sqrt(sigma_ppxf**2 - (sigma_gal**2 - sigma_template**2))
     return corrected_sigma
 
+def generate_voronoi_cubes(data_cube, voronoi_bins):
+    # Get the dimensions of the data cube
+    nz, nx, ny = data_cube.shape
+    
+    # Create an empty dictionary to store the summed spectra for each Voronoi cell
+    voronoi_cells = {}
+    # Create an empty dictionary to count the number of spaxels in each Voronoi cell
+    voronoi_counts = {}
+    
+    # Iterate over each spaxel in the Voronoi data
+    for x, y, cell in voronoi_bins:
+        # If the cell is not in the dictionary, add it with an empty spectrum and count
+        if cell not in voronoi_cells:
+            voronoi_cells[cell] = np.zeros(nz)
+            voronoi_counts[cell] = 0
+        
+        # Add the spectrum of the current spaxel to the corresponding Voronoi cell
+        voronoi_cells[cell] += data_cube[:, x, y]
+        # Increment the count of spaxels in the Voronoi cell
+        voronoi_counts[cell] += 1
+    
+    # Create an empty data cube for the Voronoi cells
+    voronoi_cube = np.zeros((nz, nx, ny))
+    
+    # Assign the averaged spectra to the Voronoi cube
+    for x, y, cell in voronoi_bins:
+        voronoi_cube[:, x, y] = voronoi_cells[cell] / voronoi_counts[cell]
+    
+    return voronoi_cube
 
 # Read header to get wave range if not provided
 if args.wave_range is None:
@@ -446,6 +477,17 @@ x_flat = indices_x.flatten()
 y_flat = indices_y.flatten()
 voronoi_bins = np.column_stack((x_flat, y_flat, bin_num))
 np.savetxt(path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", f"_voronoi_binning_info_sn_{target_sn}{suffix}.txt")), voronoi_bins, fmt='%.i %.i %.i', comments='')
+# Generate the Voronoi cubes
+voronoi_cube_data = generate_voronoi_cubes(s.original_data, voronoi_bins)
+# Save the Voronoi cube to a new FITS file with the same header as the original cube
+hdu_voronoi = fits.PrimaryHDU(data=voronoi_cube_data, header=s.header)
+voronoi_results_FITS = os.path.join(args.output_dir, f"{base_filename}_voronoi_binned_sn_{target_sn}{suffix}.fits")
+hdu_voronoi.writeto(voronoi_results_FITS, overwrite=True)
+# Save SNR maps to FITS files
+snr = (signal/noise).reshape((28, 31))
+hdu_snr_before = fits.PrimaryHDU(data=snr, header=header)
+snr_results_FITS = os.path.join(args.output_dir, f"{base_filename}_snr_map{suffix}.fits")
+hdu_snr_before.writeto(snr_results_FITS, overwrite=True)
 
 ## Setup stellar templates
 #The important formula below **defines** the relation between velocity, wavelength and redshift in ``pPXF`` (eq. 8 of [Cappellari 2017](https://ui.adsabs.harvard.edu/abs/2017MNRAS.466..798C))
