@@ -562,6 +562,10 @@ nbins = sn.size
 # velbin, velbin_error, sigbin, sigbin_error, lg_age_bin, metalbin, nspax = np.zeros((7, nbins))
 velbin, velbin_error, sigbin, sigbin_error, h3bin, h3bin_error, h4bin, h4bin_error, lg_age_bin, metalbin, nspax, attbin = np.zeros((12, nbins)) # Uncomment for fitting h3 and h4 and comment the previous line
 optimal_templates = np.empty((stars_templates.shape[0], nbins))
+# Initialize a cube to store the residuals with the same spatial dimensions as the original data cube
+residuals_cube = np.zeros((len(s.ln_lam_gal), s.cube_shape[1], s.cube_shape[2]))
+# Initialize a list to store residuals for each Voronoi bin
+residuals_list = []
 
 lam_gal = np.exp(s.ln_lam_gal)
 
@@ -598,7 +602,10 @@ for j in range(nbins):
     velbin_error[j], sigbin_error[j], h3bin_error[j], h4bin_error[j] = pp.error*np.sqrt(pp.chi2)  # Uncomment for fitting h3 and h4 and comment the previous line
     optimal_templates[:, j] = bestfit_template
     attbin[j] = pp.reddening
-        
+    # Calculate the residuals for the current bin
+    residuals = galaxy - pp.bestfit
+    residuals_list.append(residuals)
+    
     # Save figures of the fittings
     
     # Code to generate the figure
@@ -649,6 +656,11 @@ else:
     corrected_sigbin_error = sigbin_error
 
 
+# Assign the residuals to the corresponding spaxels in the residuals cube
+for x, y, vor_bin_num in voronoi_bins:
+    residuals_cube[:, x, y] = residuals_list[vor_bin_num]
+
+
 # Save results as FITS files.
 
 # Specify the output file names
@@ -658,6 +670,7 @@ else:
 kinematics_results_FITS = os.path.join(args.output_dir, f"{base_filename}_kinematics_sn_{target_sn}{suffix}.fits")
 stellar_pops_results_FITS = os.path.join(args.output_dir, f"{base_filename}_stellar_pops_sn_{target_sn}{suffix}.fits")
 attenuation_results_FITS = os.path.join(args.output_dir, f"{base_filename}_attenuation_sn_{target_sn}{suffix}.fits")
+residuals_results_FITS = os.path.join(args.output_dir, f"{base_filename}_residuals_sn_{target_sn}{suffix}.fits")
 
 #kinematics_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_kinematics.fits"))
 #stellar_pops_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_stellar_pops.fits"))
@@ -681,3 +694,4 @@ attenuation_fitting_results = attbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_
 save_results_as_fits(kinematics_fitting_results, spectra_filename, kinematics_results_FITS)
 save_results_as_fits(stellar_pops_fitting_results, spectra_filename, stellar_pops_results_FITS)
 save_results_as_fits(attenuation_fitting_results, spectra_filename, attenuation_results_FITS)
+save_results_as_fits(residuals_cube, spectra_filename, residuals_results_FITS)
