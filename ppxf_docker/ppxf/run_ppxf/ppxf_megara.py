@@ -39,6 +39,8 @@ parser.add_argument('--velocity-dispersion', type=float, default=100.0, metavar=
                     help='Initial guess for the velocity dispersion of the galaxy (default: 100 km/s)')
 parser.add_argument('--sn-range', nargs=2, type=float, metavar=('start', 'end'),
                     help='Range of wavelengths to calculate the signal-to-noise ratio (default: same as --wave-range)')
+parser.add_argument('--min-sn', type=float, default=0.0, metavar='MIN_SN',
+                    help='Minimum signal-to-noise ratio for spaxels (default: 0)')
                     
 args = parser.parse_args()
 
@@ -413,7 +415,10 @@ def generate_voronoi_cubes(data_cube, voronoi_bins):
     
     # Assign the averaged spectra to the Voronoi cube
     for x, y, cell in voronoi_bins:
-        voronoi_cube[:, x, y] = voronoi_cells[cell] / voronoi_counts[cell]
+        if cell == -1:
+            voronoi_cube[:, x, y] = np.nan
+        else:
+            voronoi_cube[:, x, y] = voronoi_cells[cell] / voronoi_counts[cell]
     
     return voronoi_cube
 
@@ -466,7 +471,7 @@ suffix = f"_{args.suffix}" if args.suffix else ''
 # Perform Voronoi binning with the method of [Cappellari & Copin (2003)](https://ui.adsabs.harvard.edu/abs/2003MNRAS.342..345C)
 
 plt.figure(figsize=(7,10))
-bin_num, x_gen, y_gen, xbin, ybin, sn, nPixels, scale = voronoi_2d_binning(s.x, s.y, signal, noise, target_sn, plot=1, quiet=1)
+bin_num, x_gen, y_gen, xbin, ybin, sn, nPixels, scale = voronoi_2d_binning(s.x, s.y, signal, noise, target_sn, plot=1, quiet=1, min_sn=args.min_sn)
 plt.savefig(path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", f"_voronoi_binning_sn_{target_sn}{suffix}.pdf")),dpi=600)
 # Saving the information of which Voronoi region each pixel belongs to
 
@@ -562,8 +567,7 @@ nbins = sn.size
 # velbin, velbin_error, sigbin, sigbin_error, lg_age_bin, metalbin, nspax = np.zeros((7, nbins))
 velbin, velbin_error, sigbin, sigbin_error, h3bin, h3bin_error, h4bin, h4bin_error, lg_age_bin, metalbin, nspax, attbin = np.zeros((12, nbins)) # Uncomment for fitting h3 and h4 and comment the previous line
 optimal_templates = np.empty((stars_templates.shape[0], nbins))
-# Initialize a cube to store the residuals with the same spatial dimensions as the original data cube
-residuals_cube = np.zeros((len(s.ln_lam_gal), s.cube_shape[1], s.cube_shape[2]))
+
 # Initialize a list to store residuals for each Voronoi bin
 residuals_list = []
 
@@ -656,9 +660,36 @@ else:
     corrected_sigbin_error = sigbin_error
 
 
-# Assign the residuals to the corresponding spaxels in the residuals cube
+
+# Create output cubes for kinematics and stellar_pops
+kinematics_fitting_results = np.full((8, s.cube_shape[1], s.cube_shape[2]), np.nan)
+stellar_pops_fitting_results = np.full((2, s.cube_shape[1], s.cube_shape[2]), np.nan)
+attenuation_fitting_results = np.full((1, s.cube_shape[1], s.cube_shape[2]), np.nan)
+residuals_cube = np.full((len(s.ln_lam_gal), s.cube_shape[1], s.cube_shape[2]), np.nan)
+
+# Assign the results to the corresponding output cubes
 for x, y, vor_bin_num in voronoi_bins:
-    residuals_cube[:, x, y] = residuals_list[vor_bin_num]
+    if vor_bin_num != -1:
+        # Assign kinematics results
+        kinematics_fitting_results[0, x, y] = velbin[vor_bin_num]
+        kinematics_fitting_results[1, x, y] = velbin_error[vor_bin_num]
+        kinematics_fitting_results[2, x, y] = corrected_sigbin[vor_bin_num]
+        kinematics_fitting_results[3, x, y] = corrected_sigbin_error[vor_bin_num]
+        kinematics_fitting_results[4, x, y] = h3bin[vor_bin_num]
+        kinematics_fitting_results[5, x, y] = h3bin_error[vor_bin_num]
+        kinematics_fitting_results[6, x, y] = h4bin[vor_bin_num]
+        kinematics_fitting_results[7, x, y] = h4bin_error[vor_bin_num]
+        
+        # Assign stellar_pops results
+        stellar_pops_fitting_results[0, x, y] = lg_age_bin[vor_bin_num]
+        stellar_pops_fitting_results[1, x, y] = metalbin[vor_bin_num]
+
+        # Assign attenuation results
+        attenuation_fitting_results[0, x, y] = attbin[vor_bin_num]
+        
+        # Assign residuals results
+        residuals_cube[:, x, y] = residuals_list[vor_bin_num]
+
 
 
 # Save results as FITS files.
@@ -676,19 +707,19 @@ residuals_results_FITS = os.path.join(args.output_dir, f"{base_filename}_residua
 #stellar_pops_results_FITS = path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_stellar_pops.fits"))
 #attenuation_results_FITS = os.path.join(args.output_dir, args.filename.split("/")[-1].replace(".fits", "_attenuation.fits"))
 
-kinematics_fitting_results = np.concatenate([velbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                             velbin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                             corrected_sigbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                             corrected_sigbin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                             h3bin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                             h3bin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                             h4bin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                             h4bin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])], axis=0)
+# kinematics_fitting_results = np.concatenate([velbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                              velbin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                              corrected_sigbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                              corrected_sigbin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                              h3bin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                              h3bin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                              h4bin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                              h4bin_error[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])], axis=0)
 
-stellar_pops_fitting_results = np.concatenate([lg_age_bin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
-                                               metalbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])], axis=0)
+# stellar_pops_fitting_results = np.concatenate([lg_age_bin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2]),
+#                                                metalbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])], axis=0)
 
-attenuation_fitting_results = attbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])
+# attenuation_fitting_results = attbin[bin_num].reshape(-1,s.cube_shape[1],s.cube_shape[2])
 
 # Call the function to save the results as a FITS file
 save_results_as_fits(kinematics_fitting_results, spectra_filename, kinematics_results_FITS)
