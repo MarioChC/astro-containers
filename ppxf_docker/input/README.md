@@ -35,6 +35,8 @@ filename: Path to the spectra file to be analyzed.
 
 --sn-range start end: Range of wavelengths to calculate the signal-to-noise ratio (default: same as --wave-range).
 
+--min-sn MIN_SN: Minimum signal-to-noise ratio for spaxels to be included in the analysis (default: 0).
+
 These arguments allow users to customize the analysis of MEGARA cube data by specifying parameters such as the file paths, wavelength ranges, signal-to-noise ratios, SPS models, output directories, and redshift values.
 
 Feel free to adjust and expand upon this template to better suit your needs!
