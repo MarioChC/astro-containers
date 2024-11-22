@@ -316,7 +316,10 @@ def calculate_signal_to_noise(spectrum, wavelength, mask_file=None, wavelength_r
         column_signal = np.median(column_spectrum[valid_indices])
         column_noise = np.sqrt(column_signal)
         signal[i] = column_signal
-        noise[i] = column_noise
+        if column_noise > 0:
+            noise[i] = column_noise
+        else:
+            noise[i] = 1
 
     # Calculate the signal-to-noise ratio for each column
     snr = signal / noise
