@@ -1,4 +1,4 @@
-# Voronoi Rebinning Docker Container
+# Voronoi Binning Docker Container
 
 This project provides a preconfigured Docker container for running Voronoi rebinning on astronomical data cubes. Voronoi rebinning is a technique used in astronomy to improve the signal-to-noise ratio in their data. By encapsulating this process in a Docker container, we facilitate its execution without worrying about environment dependencies.
 
