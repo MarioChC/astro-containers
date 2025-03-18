@@ -48,11 +48,11 @@ docker exec voronoi_container /home/voronoi/shared_directory/input/bash_script.s
 
 Each data cube will generate the following set of output files:
 
-- NGC7025_LR-V_final_cube_sn_fitting_plots.pdf
-- NGC7025_LR-V_final_cube_snr_map.fits
-- NGC7025_LR-V_final_cube_voronoi_input.txt
-- NGC7025_LR-V_final_cube_voronoi_binning_sn_40.0.pdf
-- NGC7025_LR-V_final_cube_voronoi_output.txt
-- NGC7025_LR-V_final_cube_voronoi_binned_sn_40.0.fits
-- NGC7025_LR-V_final_cube_voronoi_cell_numbers.fits
-- NGC7025_LR-V_final_cube_individual_voronoi_spectra_sn_40.0 (folder)
+- <INPUT_FILENAME>_sn_fitting_plots.pdf
+- <INPUT_FILENAME>_snr_map.fits
+- <INPUT_FILENAME>_voronoi_input.txt
+- <INPUT_FILENAME>_voronoi_binning_sn_40.0.pdf
+- <INPUT_FILENAME>_voronoi_output.txt
+- <INPUT_FILENAME>_voronoi_binned_sn_40.0.fits
+- <INPUT_FILENAME>_voronoi_cell_numbers.fits
+- <INPUT_FILENAME>_individual_voronoi_spectra_sn_40.0 (folder)
