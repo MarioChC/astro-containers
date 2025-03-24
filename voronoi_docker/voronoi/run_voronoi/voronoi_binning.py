@@ -62,7 +62,8 @@ def read_megara_cube(spectra_filename):
         'lam_gal': wave,
         'pixlimf1': head['PIXLIMF1'],
         'pixlimf2': head['PIXLIMF2'],
-        'pixelsize': head['CDELT2']*3600
+        # 'pixelsize': head['CDELT2']*3600
+        'pixelsize': None
     }
 
 def read_manga_cube(spectra_filename):
@@ -84,7 +85,8 @@ def read_manga_cube(spectra_filename):
         'data_cgs': spectra_cgs,
         'header': head,
         'lam_gal': wave,
-        'pixelsize': head['CD2_2']*3600
+        # 'pixelsize': head['CD2_2']*3600
+        'pixelsize': None
     }
 
 def read_muse_cube(spectra_filename):
