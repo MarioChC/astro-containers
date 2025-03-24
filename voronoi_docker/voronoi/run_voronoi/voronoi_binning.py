@@ -390,9 +390,9 @@ def signal_to_noise_estimation_spline(result, valid_pixels, knots_number, lam_ga
 
 def signal_to_noise_estimation_brightest_spaxel(result, valid_pixels, knots_number, lam_gal, plot=False):
     """
-    Estimate the signal-to-noise ratio for each pixel in the data scaling its value from the s/n of the brightest spaxel. 
-    First, the signal-to-noise ratio is calculated for the brightest spaxel, and then this value is used to calculate the 
-    signal-to-noise ratio for the rest of the spaxels by scaling it with the square root of the brightness ratio between 
+    Estimate the signal-to-noise ratio for each pixel in the data scaling its value from the s/n of the brightest spaxel.
+    First, the signal-to-noise ratio is calculated for the brightest spaxel, and then this value is used to calculate the
+    signal-to-noise ratio for the rest of the spaxels by scaling it with the square root of the brightness ratio between
     each spaxel and the brightest spaxel.
 
     Parameters:
@@ -423,7 +423,7 @@ def signal_to_noise_estimation_brightest_spaxel(result, valid_pixels, knots_numb
     brightness = np.sum(result['data'], axis=0)
 
     # Find the index of the brightest spaxel
-    max_brightness_index = np.unravel_index(np.argmax(brightness, axis=None), brightness.shape)     
+    max_brightness_index = np.unravel_index(np.argmax(brightness, axis=None), brightness.shape)
     
     # Polynomial fitting to calculate the signal-to-noise ratio of the brightest spaxel
     spline = LSQUnivariateSpline(valid_pixels, result['data'][valid_pixels, max_brightness_index[0], max_brightness_index[1]], t=knots[1:-1])  # Exclude the extremes
@@ -510,8 +510,8 @@ def signal_to_noise_estimation_brightest_spaxel(result, valid_pixels, knots_numb
 
 def signal_to_noise_estimation_signal_square_root(result, valid_pixels, lam_gal):
     """
-    Estimate the signal-to-noise ratio for each pixel in the data using the method described by Cappellari. 
-    This method calculates the signal-to-noise ratio by taking the median signal value for each spaxel and 
+    Estimate the signal-to-noise ratio for each pixel in the data using the method described by Cappellari.
+    This method calculates the signal-to-noise ratio by taking the median signal value for each spaxel and
     using the square root of this value as the noise estimate.
 
     Parameters:
@@ -585,71 +585,8 @@ def filter_by_signal_to_noise(sn_coordinates, min_sn):
     
     return filtered_sn_coordinates
 
-# def generate_voronoi_cubes(data_cube, voronoi_bins):
-#     """
-#     Generate a Voronoi cube by averaging the spectra of spaxels within each Voronoi cell.
 
-#     This function takes a data cube and a set of Voronoi bins, and creates a new data cube where each spaxel's 
-#     spectrum is the average of the spectra of all spaxels within the same Voronoi cell. The Voronoi bins set 
-#     contains tuples of the form (x, y, cell), where x and y are the coordinates of the spaxel, and cell is the 
-#     Voronoi cell number.
-
-#     Parameters:
-#     data_cube (ndarray): 3D array containing the spectral data (nz, ny, nx).
-#     voronoi_bins (array): Array of tuples (x, y, cell) indicating the Voronoi cell assignment for each spaxel.
-
-#     Returns:
-#     voronoi_cube (ndarray): 3D array with the averaged spectra for each Voronoi cell.
-#     """
-#     # Get the dimensions of the data cube
-#     nz, ny, nx = data_cube.shape
-    
-#     # Create an empty dictionary to store the summed spectra for each Voronoi cell
-#     voronoi_cells = {}
-#     # Create an empty dictionary to count the number of spaxels in each Voronoi cell
-#     voronoi_counts = {}
-    
-#     # Create a 2D image where each pixel value is the Voronoi cell number, initialized with NaN
-#     voronoi_image = np.full((ny, nx), np.nan)
-    
-#     # Iterate over each spaxel in the Voronoi data
-#     for x, y, cell in voronoi_bins:
-#         # If the cell is not in the dictionary, add it with an empty spectrum and count
-#         if cell not in voronoi_cells:
-#             voronoi_cells[cell] = np.zeros(nz)
-#             voronoi_counts[cell] = 0
-        
-#         # Add the spectrum of the current spaxel to the corresponding Voronoi cell
-#         voronoi_cells[cell] += data_cube[:, y-1, x-1]
-#         # Increment the count of spaxels in the Voronoi cell
-#         voronoi_counts[cell] += 1
-        
-#         # Assign the Voronoi cell number to the corresponding pixel in the 2D Voronoi image
-#         voronoi_image[y-1, x-1] = cell 
-    
-#     # Create an empty data cube for the Voronoi cells
-#     voronoi_cube = np.zeros((nz, ny, nx))
-    
-#     # Assign the averaged spectra to the Voronoi cube
-#     for x, y, cell in voronoi_bins:
-#         if cell == -1:
-#             voronoi_cube[:, y-1, x-1] = np.nan
-#         else:
-#             voronoi_cube[:, y-1, x-1] = voronoi_cells[cell] / voronoi_counts[cell]
-            
-#     # Save the Voronoi cube to a new FITS file with the same header as the original cube
-#     hdu_voronoi = fits.PrimaryHDU(data=voronoi_cube, header=result['header'])
-#     voronoi_results_FITS = os.path.join(args.output_dir, f"{base_filename}_voronoi_binned_sn_{target_sn}{suffix}.fits")
-#     hdu_voronoi.writeto(voronoi_results_FITS, overwrite=True)
-    
-#     # Save the Voronoi cell number image to a new FITS file
-#     hdu_voronoi_image = fits.PrimaryHDU(data=voronoi_image, header=result['header'])
-#     voronoi_image_FITS = os.path.join(args.output_dir, f"{base_filename}_voronoi_cell_numbers_sn_{target_sn}{suffix}.fits")
-#     hdu_voronoi_image.writeto(voronoi_image_FITS, overwrite=True)
-    
-#     return voronoi_cube
-
-def generate_voronoi_cubes(data_cube, voronoi_bins, header, generate_individual_spectra=False):    
+def generate_voronoi_cubes(data_cube, voronoi_bins, header, generate_individual_spectra=False):
     # Get the dimensions of the data cube
     nz, ny, nx = data_cube.shape
     
@@ -694,7 +631,7 @@ def generate_voronoi_cubes(data_cube, voronoi_bins, header, generate_individual_
 
     # Save the Voronoi cell number image to a new FITS file
     hdu_voronoi_image = fits.PrimaryHDU(data=voronoi_image, header=header)
-    voronoi_image_FITS = os.path.join(args.output_dir, f"{base_filename}_voronoi_cell_numbers{suffix}.fits")
+    voronoi_image_FITS = os.path.join(args.output_dir, f"{base_filename}_voronoi_cell_numbers_sn_{target_sn}{suffix}.fits")
     hdu_voronoi_image.writeto(voronoi_image_FITS, overwrite=True)
     
     if generate_individual_spectra:
@@ -804,7 +741,7 @@ base_filename = os.path.basename(args.filename).replace('.fits', '')
 suffix = f"_{args.suffix}" if args.suffix else ''
 
 # Calculate the valid pixels for S/N calculation based on the provided wavelength intervals, mask file and redshift parameters
-valid_pixels = calculate_valid_pixels(result, wavelength_start=args.wavelength_start, wavelength_end=args.wavelength_end, 
+valid_pixels = calculate_valid_pixels(result, wavelength_start=args.wavelength_start, wavelength_end=args.wavelength_end,
                                       apply_redshift=args.apply_redshift, redshift=args.redshift, mask_file=args.mask_file)
 
 
