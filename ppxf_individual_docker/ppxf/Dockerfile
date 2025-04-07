@@ -14,7 +14,7 @@ RUN echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy-upd
 
 
 # Install ppxf and other dependencies using pip
-RUN pip install --no-cache-dir ppxf vorbin plotbin
+RUN pip install --no-cache-dir ppxf vorbin plotbin specutils
 
 RUN apt update -y
 
