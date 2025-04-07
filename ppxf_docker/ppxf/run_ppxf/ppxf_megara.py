@@ -260,9 +260,9 @@ def save_results_as_fits(result_data, original_file, new_filename):
     with fits.open(original_file) as hdul:
         header = hdul[0].header
 
-    # Modify the keyword with the new value
-    header["CRVAL3"] = 1
-    header["CDELT3"] = 1
+    # # Modify the keyword with the new value
+    # header["CRVAL3"] = 1
+    # header["CDELT3"] = 1
     
     # Create a new FITS extension with the result data and the original header
     new_hdu = fits.PrimaryHDU(data=result_data, header=header)
