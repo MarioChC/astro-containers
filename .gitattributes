@@ -1,0 +1,2 @@
+*.npz filter=lfs diff=lfs merge=lfs -text
+ppxf_individual_docker/ppxf/run_ppxf/ssp_models/*.npz filter=lfs diff=lfs merge=lfs -text
