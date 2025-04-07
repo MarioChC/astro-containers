@@ -535,13 +535,15 @@ for spectra_filename in spectra_filenames:
         light_weights = pp.weights.reshape(reg_dim)
         lg_age_bin, metalbin = sps.mean_age_metal(light_weights)
         
-        M_L_ratio_V = sps.mass_to_light(light_weights, band='V', redshift=args.redshift)
+        #M_L_ratio_V = sps.mass_to_light(light_weights, band='V', redshift=args.redshift)
         
         with open(voronoi_output_file_name, 'a') as voronoi_output_file:
             voronoi_output_file.write("Stellar populations results:\n")
             voronoi_output_file.write("\n")
-            voronoi_output_file.write("{:<20} {:<20} {:<20} {:<15}\n".format("Weihgted_Age(Gyr)", "Weighted_Metallicity", "M*/L(V_band)", "A_V"))
-            voronoi_output_file.write("{:<20.8f} {:<20.8f} {:<20.8f} {:<15.8f}\n".format((10**lg_age_bin)/10**9, metalbin, M_L_ratio_V, attbin))
+            #voronoi_output_file.write("{:<20} {:<20} {:<20} {:<15}\n".format("Weihgted_Age(Gyr)", "Weighted_Metallicity", "M*/L(V_band)", "A_V"))
+            #voronoi_output_file.write("{:<20.8f} {:<20.8f} {:<20.8f} {:<15.8f}\n".format((10**lg_age_bin)/10**9, metalbin, M_L_ratio_V, attbin))
+            voronoi_output_file.write("{:<20} {:<20} {:<15}\n".format("Weihgted_Age(Gyr)", "Weighted_Metallicity", "A_V"))
+            voronoi_output_file.write("{:<20.8f} {:<20.8f} {:<15.8f}\n".format((10**lg_age_bin)/10**9, metalbin, attbin))
             voronoi_output_file.write('*' * 73 + "\n")
             voronoi_output_file.write("\n")
         
