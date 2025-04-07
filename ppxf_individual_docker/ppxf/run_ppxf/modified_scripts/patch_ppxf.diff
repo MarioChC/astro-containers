@@ -1,5 +1,5 @@
---- /usr/local/lib/python3.8/dist-packages/ppxf/ppxf.py	2024-11-07 12:27:08.749543905 +0000
-+++ shared_directory/ppxf.py	2024-11-07 19:06:30.809544785 +0000
+--- /usr/local/lib/python3.8/dist-packages/ppxf/ppxf.py	2025-03-18 12:36:32.604729006 +0000
++++ shared_directory/ppxf.py	2025-03-18 12:30:06.490842595 +0000
 @@ -1,5 +1,5 @@
  """
 -    Copyright (C) 2001-2024, Michele Cappellari
@@ -27,106 +27,7 @@
  
  ###############################################################################
  
-@@ -202,81 +212,73 @@
- 
- ################################################################################
- 
--def regularization(a, npoly, p, reg_dim, reg_ord, reg_step, regul):
-+def regularization(a, npoly, p, reg_dim, reg_ord, regul):
-     """
-     Add first or second order 1D, 2D or 3D linear regularization.
--    With equal reg_step and reg_ord=2, this implements Equation (26) of 
--    `Cappellari (2017) <https://ui.adsabs.harvard.edu/abs/2017MNRAS.466..798C>`_
--    This function allows for non-uniform steps in the different dimensions.
-+    Equation (25) of `Cappellari (2017)
-+    <https://ui.adsabs.harvard.edu/abs/2017MNRAS.466..798C>`_
- 
-     """
-     b = a[:, npoly : npoly + np.prod(reg_dim)].reshape(-1, *reg_dim)
- 
-     if reg_ord == 1:   # Minimize integral of (Grad[w] @ Grad[w])
--        diff = [[regul, -regul]/rs[:, None] for rs in reg_step]
-+        diff = np.array([1, -1])*regul
-         if reg_dim.size == 1:
-             for j in range(reg_dim[0] - 1):
--                b[p, j : j + 2] = diff[0][j]
-+                b[p, j : j + 2] = diff
-                 p += 1
-         elif reg_dim.size == 2:
-             for k in range(reg_dim[1]):
-                 for j in range(reg_dim[0]):
-                     if j < reg_dim[0] - 1:
--                        b[p, j : j + 2, k] = diff[0][j]
-+                        b[p, j : j + 2, k] = diff
-                         p += 1
-                     if k < reg_dim[1] - 1:
--                        b[p, j, k : k + 2] = diff[1][k]
-+                        b[p, j, k : k + 2] = diff
-                         p += 1
-         elif reg_dim.size == 3:
-             for q in range(reg_dim[2]):
-                 for k in range(reg_dim[1]):
-                     for j in range(reg_dim[0]):
-                         if j < reg_dim[0] - 1:
--                            b[p, j : j + 2, k, q] = diff[0][j]
-+                            b[p, j : j + 2, k, q] = diff
-                             p += 1
-                         if k < reg_dim[1] - 1:
--                            b[p, j, k : k + 2, q] = diff[1][k]
-+                            b[p, j, k : k + 2, q] = diff
-                             p += 1
-                         if q < reg_dim[2] - 1:
--                            b[p, j, k, q : q + 2] = diff[2][q]
-+                            b[p, j, k, q : q + 2] = diff
-                             p += 1
-     elif reg_ord == 2:   # Minimize integral of Laplacian[w]**2
--        diff = []
--        for rs in reg_step:
--            h1, h2 = rs[:-1], rs[1:]
--            hh = h1 + h2
--            diff.append(2*regul/np.column_stack([h1*hh, -h1*h2, h2*hh]))
-+        diff = np.array([1, -2, 1])*regul
-         if reg_dim.size == 1:
-             for j in range(1, reg_dim[0] - 1):
--                b[p, j - 1 : j + 2] = diff[0][j - 1]
-+                b[p, j - 1 : j + 2] = diff
-                 p += 1
-         elif reg_dim.size == 2:
-             for k in range(reg_dim[1]):
-                 for j in range(reg_dim[0]):
-                     if 0 < j < reg_dim[0] - 1:
--                        b[p, j - 1 : j + 2, k] = diff[0][j - 1]
-+                        b[p, j - 1 : j + 2, k] = diff
-                     if 0 < k < reg_dim[1] - 1:
--                        b[p, j, k - 1 : k + 2] += diff[1][k - 1]
-+                        b[p, j, k - 1 : k + 2] += diff
-                     p += 1
-         elif reg_dim.size == 3:
-             for q in range(reg_dim[2]):
-                 for k in range(reg_dim[1]):
-                     for j in range(reg_dim[0]):
-                         if 0 < j < reg_dim[0] - 1:
--                            b[p, j - 1 : j + 2, k, q] = diff[0][j - 1]
-+                            b[p, j - 1 : j + 2, k, q] = diff
-                         if 0 < k < reg_dim[1] - 1:
--                            b[p, j, k - 1 : k + 2, q] += diff[1][k - 1]
-+                            b[p, j, k - 1 : k + 2, q] += diff
-                         if 0 < q < reg_dim[2] - 1:
--                            b[p, j, k, q - 1 : q + 2] += diff[2][q - 1]
-+                            b[p, j, k, q - 1 : q + 2] += diff
-                         p += 1
- 
- ################################################################################
- 
- class ppxf:
-     """
--    pPXF Class
--    ==========
--
-     pPXF Purpose
-     ------------
- 
-@@ -339,31 +341,26 @@
+@@ -331,31 +341,26 @@
                    constr_kinem=None, degree=4, dust=None, fixed=None,
                    fraction=None, ftol=1e-4, gas_component=None, gas_names=None,
                    gas_reddening=None, gas_reddening_func=None,
@@ -174,7 +75,7 @@
  
      templates: array_like with shape (n_pixels_temp, n_templates)
          Vector containing a single log-rebinned spectral template, or an array
-@@ -474,7 +471,7 @@
+@@ -466,7 +471,7 @@
          ``velscale = c*np.diff(np.log(lambda))``, which is approximately
          ``velscale ~ c*np.diff(lambda)/lambda``.
          See Section 2.3 of `Cappellari (2017)`_ for details.
@@ -183,7 +84,7 @@
          Vector, or list/array of vectors ``[start1, start2, ...]``, with the
          initial estimate for the LOSVD parameters.
  
-@@ -517,8 +514,8 @@
+@@ -509,8 +514,8 @@
              moments = [4, 2]
              start = [[V1, sigma1], [V2, sigma2]]
  
@@ -194,7 +95,7 @@
  
      bias: float, optional
          When ``moments > 2``, this parameter biases the ``(h3, h4, ...)``
-@@ -536,7 +533,7 @@
+@@ -528,7 +533,7 @@
          residuals, so it is insensitive to proper scaling of the ``noise``
          vector. A nonzero ``bias`` can be safely used even without a reliable
          ``noise`` spectrum, or with equal weighting for all pixels.
@@ -203,7 +104,7 @@
          Lower and upper bounds for every kinematic parameter. This is an array,
          or list of arrays, with the same dimensions as ``start``, except for
          the last dimension, which is 2. In practice, for every element of
-@@ -558,7 +555,7 @@
+@@ -550,7 +555,7 @@
              bounds_gas = [[V2_lo, V2_up], [sigma2_lo, sigma2_up]]
              bounds = [bounds_stars, bounds_gas]
  
@@ -212,16 +113,7 @@
          When fitting more than one kinematic component, this keyword should
          contain the component number of each input template. In principle,
          every template can belong to a different kinematic component.
-@@ -791,7 +788,7 @@
-             dust_stars = {"start": [0.1, -0.1], "bounds": [[0, 4], [-1, 0.4]], "component": ~gas_component}
-             dust = [dust_gas, dust_stars]
- 
--    fixed: optional
-+    fixed:
-         Boolean vector set to ``True`` where a given kinematic parameter has to
-         be held fixed with the value given in ``start``. This is an array, or
-         list, with the same dimensions as ``start``.
-@@ -835,7 +832,7 @@
+@@ -827,7 +832,7 @@
      ftol: float, optional
          Fractional tolerance for stopping the non-linear minimization (default
          1e-4).
@@ -230,7 +122,7 @@
          Boolean vector, of the same size as ``component``, set to ``True``
          where the given ``component`` describes a gas emission line. If given,
          ``pPXF`` provides the ``pp.gas_flux`` and ``pp.gas_flux_error`` in
-@@ -847,7 +844,7 @@
+@@ -839,7 +844,7 @@
              gas_component = component > 0
  
          This keyword is also used to plot the gas lines with a different color.
@@ -239,7 +131,7 @@
          String array specifying the names of the emission lines (e.g.
          ``gas_names=["Hbeta", "[OIII]",...]``, one per gas line. The length of
          this vector must match the number of nonzero elements in
-@@ -965,7 +962,7 @@
+@@ -957,7 +962,7 @@
  
          The use of linear constraints with ``constr_kinem`` is only supported
          with the default ``method='capfit'``.
@@ -248,73 +140,7 @@
          Order of the Gauss-Hermite moments to fit. Set this keyword to 4 to
          fit ``[h3, h4]`` and to 6 to fit ``[h3, h4, h5, h6]``. Note that in all
          cases the G-H moments are fitted (non-linearly) *together* with
-@@ -1085,65 +1082,6 @@
- 
-         NOTE: This keyword is obsolete. I recommend using the more flexible and
-         general ``dust`` keyword instead.
--    reg_dim: tuple, optional
--        When using regularization with more than one kinematic component (using
--        the ``component`` keyword), the regularization is only applied to the
--        first one (``component=0``). This is useful to fit the stellar
--        population and gas emissions together.
--
--        In this situation, one has to use the ``reg_dim`` keyword, to give
--        ``pPXF`` the dimensions of the population parameters (e.g. ``n_age``,
--        ``n_metal``, ``n_alpha``). One should create the initial array of
--        population templates like e.g.
--        ``templates[n_pixels, n_age, n_metal, n_alpha]`` and define::
--
--            reg_dim = templates.shape[1:]   # = [n_age, n_metal, n_alpha]
--
--        The array of stellar templates is then reshaped into a 2-dim array as::
--
--            templates = templates.reshape(templates.shape[0], -1)
--
--        and the gas emission templates are appended as extra columns at the
--        end. An usage example is given in
--        ``ppxf_example_population_gas_sdss.py``.
--
--        When using regularization with a single component (the ``component``
--        keyword is not used, or contains identical values), the number of
--        population templates along different dimensions (e.g. ``n_age``,
--        ``n_metal``, ``n_alpha``) is inferred from the dimensions of the
--        ``templates`` array and this keyword is not necessary.
--    reg_ord: int, optional
--        Order of the derivative that is minimized by the regularization.
--        The following two rotationally-symmetric estimators are supported:
--
--        * ``reg_ord=1``: minimizes the integral over the weights of the squared
--          gradient::
--
--            Grad[w] @ Grad[w].
--
--        * ``reg_ord=2``: minimizes the integral over the weights of the squared
--          curvature::
--
--            Laplacian[w]**2.
--
--    reg_step: list of arrays, shape (len(reg_dim),), optional
--        Defines the step sizes for numerical estimation of derivatives during
--        regularization. Each array in the list corresponds to a dimension in
--        ``reg_dim``, specifying the step size for each interval within that
--        dimension. By default, if ``reg_step`` is not provided, a step size of
--        one is assumed for all dimensions, equivalent to 
--        ``reg_step = [np.ones(rd - 1) for rd in reg_dim]``. To customize,
--        provide ``reg_step`` as a list containing arrays, where each array has
--        a length of ``reg_dim[j] - 1``, allowing for variable step sizes across
--        intervals and dimensions.
--
--        NOTE 1: Multiplying each element in ``reg_step`` by a constant factor
--        ``k`` has the same effect as dividing the regularization parameter
--        ``regul`` by ``k**reg_ord``.
--
--        NOTE 2: The standard approach consists of sampling the SPS template
--        spectra logarithmically in age and adopt a constant unitary step,
--        **without** using this keyword.
-     regul: float, optional
-         If this keyword is nonzero, the program applies first or second-order
-         linear regularization to the ``weights`` during the ``pPXF`` fit.
-@@ -1216,6 +1154,47 @@
+@@ -1149,6 +1154,47 @@
          consistent with the observations and the derived star formation history
          will be the smoothest (minimum curvature or minimum variation) that is
          still consistent with the observations.
@@ -362,7 +188,7 @@
      sigma_diff: float, optional
          Quadratic difference in km/s defined as::
  
-@@ -1229,7 +1208,7 @@
+@@ -1162,7 +1208,7 @@
          dispersion of the galaxy spectrum. In this situation, the convolution
          is done by ``pPXF`` with increased accuracy, using an analytic Fourier
          Transform.
@@ -371,7 +197,7 @@
          vector containing the spectrum of the sky to be included in the fit, or
          array of dimensions ``sky[n_pixels, nSky]`` containing different sky
          spectra to add to the model of the observed ``galaxy`` spectrum. The
-@@ -1241,7 +1220,7 @@
+@@ -1174,7 +1220,7 @@
          where a very accurate sky subtraction is critical, it may be useful
          *not* to subtract the sky from the spectrum, but to include it in the
          fit using this keyword.
@@ -380,7 +206,7 @@
          When calling ``pPXF`` many times with an identical set of templates,
          one can use this keyword to pass the real FFT of the templates,
          computed in a previous ``pPXF`` call, stored in the
-@@ -1249,7 +1228,7 @@
+@@ -1182,7 +1228,7 @@
          that there is no need for it...
  
          IMPORTANT: Use this keyword only if you understand what you are doing!
@@ -389,7 +215,7 @@
          A list of string expressions. Each expression "ties" the parameter to
          other free or fixed parameters.  Any expression involving constants and
          the parameter array ``p[j]`` are permitted. Since they are totally
-@@ -1290,7 +1269,7 @@
+@@ -1223,7 +1269,7 @@
          the LOSVD of two kinematic components. However, this same effect is
          more efficient achieved by assigning them to the same kinematic
          component using the ``component`` keyword.
@@ -398,7 +224,7 @@
          Set ``trig=True`` to use trigonometric series as an alternative to
          Legendre polynomials, for both the additive and multiplicative
          polynomials. When ``trig=True`` the fitted series below has
-@@ -1336,32 +1315,32 @@
+@@ -1269,32 +1315,32 @@
          IMPORTANT: this value is generally *different* from the systemic
          velocity one can get from the literature. Do not try to use that!
  
@@ -438,7 +264,7 @@
          This variable contains a vector of *formal* uncertainty (``1*sigma``)
          for the fitted parameters in the output vector ``sol``.
          They are computed from the estimated covariance matrix of the standard
-@@ -1381,16 +1360,16 @@
+@@ -1314,16 +1360,16 @@
          the penalty (``bias``) should be set to zero, or better to a very small
          value. See Section 3.4 of `Cappellari & Emsellem (2004)`_ for an
          explanation.
@@ -458,7 +284,7 @@
          Vector with the integrated flux (in counts) of all lines set as
          ``True`` in the input ``gas_component`` keyword. This is the flux of
          individual gas templates, which may include multiple lines.
-@@ -1426,7 +1405,7 @@
+@@ -1359,7 +1405,7 @@
          outside the fitted wavelength range or within a masked spectral region.
          These ``np.nan`` do *not* indicate numerical issues with the actual
          ``pPXF`` calculation and the rest of the ``pPXF`` output is reliable.
@@ -467,7 +293,7 @@
          *Formal* uncertainty (``1*sigma``) for the quantity ``pp.gas_flux``, in
          the same units as the gas fluxes.
  
-@@ -1440,26 +1419,26 @@
+@@ -1373,26 +1419,26 @@
              gas_flux_error_corr = gas_flux_error*sqrt(chi^2/DOF)
                                  = pp.gas_flux_error*sqrt(pp.chi2).
  
@@ -499,7 +325,7 @@
          Prediction ``matrix[n_pixels, degree + n_templates + n_sky]`` of the
          linear system.
  
-@@ -1469,10 +1448,10 @@
+@@ -1402,10 +1448,10 @@
          ``pp.matrix[n_pixels, degree : degree + n_templates]`` contains the
          stellar/gas templates convolved by the LOSVD, and multiplied by the
          multiplicative polynomials if ``mdegree > 0``.
@@ -512,7 +338,7 @@
          This is largely superseded by the ``.mpoly`` attribute above.
  
          When ``mdegree > 0`` this contains in output the coefficients of the
-@@ -1508,7 +1487,7 @@
+@@ -1441,7 +1487,7 @@
          to plot the photometry alone and ``pp.plot(phot=False, spec=True)``
          to plot the spectrum alone. By default both the spectrum and photometry
          are included in a single plot.
@@ -521,7 +347,7 @@
          This is largely superseded by the ``.apoly`` attribute above.
  
          When ``degree >= 0`` contains the weights of the additive Legendre
-@@ -1528,9 +1507,9 @@
+@@ -1461,9 +1507,9 @@
          spectrum. In that case, the output weights of the additive polynomials
          alternate between the first (left) spectrum and the second (right)
          spectrum.
@@ -533,7 +359,7 @@
          Vector containing in output the parameters of the kinematics.
  
          * If ``moments=2`` this contains ``[Vel, Sigma]``
-@@ -1561,11 +1540,11 @@
+@@ -1494,11 +1540,11 @@
          construction kinematics parameters ``[-Vel, Sigma, -h3, h4, -h5, h6]``.
          If ``vsyst`` is nonzero (as required for two-sided fitting), then the
          output velocity is measured with respect to ``vsyst``.
@@ -547,7 +373,7 @@
          Receives the value of the weights by which each template was
          multiplied to best fit the galaxy spectrum. The optimal template can be
          computed with an array-vector multiplication::
-@@ -1667,9 +1646,9 @@
+@@ -1600,9 +1646,9 @@
                   linear=False, linear_method='lsq_box', mask=None,
                   method='capfit', mdegree=0, moments=2, phot=None, plot=False,
                   quiet=False, reddening=None, reddening_func=None, reg_dim=None,
@@ -559,7 +385,7 @@
  
          self.galaxy = galaxy
          self.nspec = galaxy.ndim     # nspec=2 for reflection-symmetric LOSVD
-@@ -1686,13 +1665,12 @@
+@@ -1619,13 +1665,12 @@
          self.quiet = quiet
          self.sky = sky
          self.vsyst = vsyst/velscale
@@ -574,7 +400,7 @@
          self.templates = templates.reshape(templates.shape[0], -1)
          self.npix_temp, self.ntemp = self.templates.shape
          self.sigma_diff = sigma_diff/velscale
-@@ -1704,7 +1682,7 @@
+@@ -1637,7 +1682,7 @@
          self.linear_method = linear_method
          self.x0 = x0  # Initialization for linear solution
          self.phot_npix = 0
@@ -583,7 +409,7 @@
          ####### Do extensive checking of possible input errors #######
  
          if method != 'capfit':
-@@ -1718,6 +1696,10 @@
+@@ -1651,6 +1696,10 @@
          assert linear_method in ['nnls', 'lsq_box', 'lsq_lin', 'cvxopt'], \
              "`linear_method` must be 'nnls', 'lsq_box', 'lsq_lin' or 'cvxopt'"
  
@@ -594,7 +420,7 @@
          if trig:
              assert degree < 0 or degree % 2 == 0, \
                  "`degree` must be even with trig=True"
-@@ -1752,19 +1734,9 @@
+@@ -1685,19 +1734,9 @@
              assert 0 < fraction < 1, "Must be `0 < fraction < 1`"
              assert self.ncomp >= 2, "At least 2 COMPONENTs are needed with FRACTION keyword"
  
@@ -617,7 +443,7 @@
  
          assert reg_ord in [1, 2], "`reg_ord` must be 1 or 2"
  
-@@ -1872,8 +1844,7 @@
+@@ -1805,8 +1844,7 @@
              assert vsyst != 0, "VSYST must be defined for two-sided fitting"
              self.goodpixels = np.append(self.goodpixels, self.npix + self.goodpixels)
  
@@ -627,7 +453,7 @@
          if templates_rfft is None:
              # Pre-compute FFT of real input of all templates
              self.templates_rfft = np.fft.rfft(self.templates, self.npad, axis=0)
-@@ -1958,8 +1929,8 @@
+@@ -1891,8 +1929,8 @@
                  self.gas_names = gas_names
              self.gas_any = True
  
@@ -638,7 +464,7 @@
          self.gas_any_zero = False
          if self.gas_any:
              vmed = np.median([a[0] for a in start1])/self.velscale
-@@ -2015,8 +1986,7 @@
+@@ -1948,8 +1986,7 @@
              assert (self.lam_temp[0] <= lam_range[0]) and (self.lam_temp[-1] >= lam_range[1]), \
                  "The `templates` must cover the full wavelength range of the " \
                  "`galaxy[goodpixels]` spectrum for the adopted velocity starting guess"
@@ -648,7 +474,7 @@
              self.templates = self.templates[ok, :]
              self.lam_temp = self.lam_temp[ok]
              self.npix_temp = self.templates.shape[0]
-@@ -2024,7 +1994,7 @@
+@@ -1957,7 +1994,7 @@
              self.vsyst = c*np.log(lam_temp_min/self.lam[0])/self.velscale
          elif self.templates.shape[0]/self.velscale_ratio > 2*self.galaxy.shape[0]:
              print("WARNING: The template is > 2x longer than the galaxy. You may "
@@ -657,7 +483,7 @@
                    "providing both `lam` and `lam_temp` for an automatic truncation")
  
  ################################################################################
-@@ -2230,7 +2200,7 @@
+@@ -2163,7 +2200,7 @@
                  bounds[p] = [-1, 1]  # Force <100% corrections
                  p += 1
  
@@ -666,7 +492,7 @@
          # {'start':..., 'bounds':..., 'fixed':..., 'component':..., 'func':...}
          if self.dust is not None:
              for d in self.dust:
-@@ -2245,7 +2215,7 @@
+@@ -2178,7 +2215,7 @@
          if self.global_search:
              glob_options = {'tol': 0.1, 'disp': 1}  # default
              if isinstance(self.global_search, dict):
@@ -675,7 +501,7 @@
              lnc = ()
              free = (fixed == 0) & (tied == '')
              if self.A_ineq_kinem is not None:
-@@ -2411,7 +2381,7 @@
+@@ -2344,7 +2381,7 @@
              b = self.galaxy/self.noise
  
          if self.regul > 0:
@@ -684,7 +510,7 @@
  
          # Select the spectral region to fit and solve the over-conditioned system
          # using SVD/BVLS. Use unweighted array for estimating bestfit predictions.
-@@ -2537,7 +2507,6 @@
+@@ -2470,7 +2507,6 @@
                  if gas_clip:
                      bestfit_shown = stars_bestfit
              sig3 = np.percentile(abs(resid[self.goodpixels]), 99.73)
@@ -692,7 +518,7 @@
              ref = np.min(bestfit_shown) - 2*sig3
              mx = np.max(bestfit_shown) + sig3
              resid += ref                           # Offset residuals to avoid overlap
-@@ -2617,6 +2586,202 @@
+@@ -2550,6 +2586,207 @@
  
  ################################################################################
  
@@ -793,7 +619,7 @@
 +            mx = np.max(bestfit_shown) + sig3
 +            mx_res = np.max(resid) + sig3
 +#            resid += ref                           # Offset residuals to avoid overlap
-+            mn = np.min(galaxy)    # Plot all fitted residuals without clipping
++            mn = np.min(galaxy) - sig3   # Plot all fitted residuals without clipping
 +            mn_res = np.min(resid)
 +            plt.plot(x, galaxy, 'k', label='Input spectrum', linewidth=0.25)
 +            plt.plot(x, stars_bestfit, 'r', label='pPXF fit', linewidth=0.5)
@@ -809,23 +635,27 @@
 +            
 +            frame2=fig.add_axes((.15,.15,.8,.14))
 +            
++            plt.axhline(y=0, color='k', linestyle='--', linewidth=0.5)
 +            plt.plot(x, resid,'g', label='Residuals', linewidth=0.25)
++            
++            resid_plot_lim = resid
 +#            plt.plot(x[self.goodpixels], resid[self.goodpixels],'g', label='Residuals', linewidth=0.25)
 +#            w = np.flatnonzero(np.diff(self.goodpixels) > 1)
 +            for wj in w:
 +                a, b = self.goodpixels[wj : wj + 2]
 +                plt.axvspan(x[a], x[b], facecolor='lightskyblue', alpha = 0.7)
 +                plt.plot(x[a : b + 1], resid[a : b + 1], 'k', linewidth=0.25)
++                resid_plot_lim[a : b + 1] = resid[a : b + 1] - resid[a : b + 1]
 +#            for k in self.goodpixels[[0, -1]]:
 +#                plt.plot(x[[k, k]], [ref, bestfit[k]], 'lightgray', linewidth=0.25)
-+
++            plt.ylim(np.min(resid_plot_lim) - sig3, np.max(resid_plot_lim) + sig3)
 +            if self.gas_any:
 +                plt.plot(x, gas_bestfit_templates + ref, 'blue', linewidth=1)
 +                plt.plot(x, gas_bestfit + ref, 'magenta', linewidth=2)
 +                plt.plot(x, bestfit, 'orange', linewidth=2)
 +#            else:
 +#                plt.plot(x[self.goodpixels], self.goodpixels*0 + ref, '.k', ms=1)
-+            plt.ylim([np.min(resid[self.goodpixels]) - sig3, np.max(resid[self.goodpixels]) + sig3] + np.array([-0.05, 0.05])*((np.min(resid[self.goodpixels]) - sig3) - (np.max(resid[self.goodpixels]) + sig3)))
++
 +        plt.xlabel("Observed wavelength [$\mathregular{\AA}$]", fontsize = 12)
 +        plt.rc('axes',linewidth=1.5)
 +        ax = plt.gca()
@@ -837,6 +667,7 @@
 +        plt.subplots_adjust(left =0.1, bottom =0.2, right =0.9, top =0.99)
 +        ax.xaxis.set_minor_locator(AutoMinorLocator())
 +        ax.yaxis.set_minor_locator(AutoMinorLocator())
++        # plt.ylim([mn_res, mx_res] + np.array([-0.05, 0.05])*(mx_res - mn_res))
 +        
 +        # Plot observed photometry
 +        if phot:
