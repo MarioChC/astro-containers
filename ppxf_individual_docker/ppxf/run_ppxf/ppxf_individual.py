@@ -544,7 +544,7 @@ for spectra_filename in spectra_filenames:
             #voronoi_output_file.write("{:<20.8f} {:<20.8f} {:<20.8f} {:<15.8f}\n".format((10**lg_age_bin)/10**9, metalbin, M_L_ratio_V, attbin))
             voronoi_output_file.write("{:<20} {:<20} {:<15}\n".format("Weihgted_Age(Gyr)", "Weighted_Metallicity", "A_V"))
             voronoi_output_file.write("{:<20.8f} {:<20.8f} {:<15.8f}\n".format((10**lg_age_bin)/10**9, metalbin, attbin))
-            voronoi_output_file.write('*' * 73 + "\n")
+            voronoi_output_file.write('*' * 52 + "\n")
             voronoi_output_file.write("\n")
         
         # Save the SSP templates used in the fitting together with their respectives weights (weight_values_nonzero/np.sum(weight_values))
