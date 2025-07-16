@@ -13,7 +13,7 @@ RUN echo "deb [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy-updates
 RUN echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy-updates universe" >> /etc/apt/sources.list
 
 # Install ppxf and other dependencies using pip
-RUN pip install --no-cache-dir ppxf vorbin
+RUN pip install --no-cache-dir ppxf==9.4.1 vorbin==3.1.5
 
 RUN apt update -y
 
